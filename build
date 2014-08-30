@@ -1,17 +1,36 @@
 
 
-echo "UGLIFY"
 
 uglifyjs \
+\
 input.js \
 graphics.js \
-obj.js \
 vector.js \
+obj.js \
 main.js \
--o app.min.js -m sort,\toplevel,eval -c \
+
+-o app.min.js -m sort,toplevel,eval -c \
 sequences,dead_code,unsafe,conditionals,comparisons,evaluate,booleans,loops,unused,join_vars,\
 hoist_funs,if_return,cascade,drop_console --overwrite\
 
+wc -c input.js
+wc -c graphics.js
+wc -c obj.js
+wc -c vector.js
+wc -c main.js
+
+
+echo ""
+echo "UGLIFY"
+echo ""
+
+wc -c app.min.js
+
 7z a app.7z app.min.js -m0=PPMd \
+
+
+echo ""
+echo "ZIPPED"
+echo ""
 
 wc -c app.7z

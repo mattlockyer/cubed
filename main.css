@@ -1,0 +1,11 @@
+
+
+#c {
+	width:320px;
+	height:320px;
+}
+
+canvas {
+	position:absolute;
+	border:2px solid black;
+}
