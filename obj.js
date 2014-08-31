@@ -31,19 +31,19 @@ Obj.prototype = {
 		//bounds
 		if (p.y < bounds.near) {
 			p.y = bounds.far;
-			t.c = move(t.c, true, -1);
+			t.c = move(t.c, true, 1);
 			if (t.z) rotate(0);
 		} else if (p.y > bounds.far) {
 			p.y = bounds.near;
-			t.c = move(t.c, true, 1);
+			t.c = move(t.c, true, -1);
 			if (t.z) rotate(1);
 		} else if (p.x < bounds.near) {
 			p.x = bounds.far;
-			t.c = move(t.c, false, -1);
+			t.c = move(t.c, false, 1);
 			if (t.z) rotate(2);
 		} else if (p.x > bounds.far) {
 			p.x = bounds.near;
-			t.c = move(t.c, false, 1);
+			t.c = move(t.c, false, -1);
 			if (t.z) rotate(3);
 		}
 		//rotation

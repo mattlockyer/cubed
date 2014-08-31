@@ -76,24 +76,25 @@ var reconcileRotationH = function() {
 var rotate = function(dir) {
 	switch (dir) {
 		case 0:
-		csv.push(csv.shift());
-		reconcileRotationV();
-		break;
-		case 1:
 		csv.unshift(csv.pop());
 		reconcileRotationV();
 		break;
+		case 1:
+		csv.push(csv.shift());
+		reconcileRotationV();
+		break;
 		case 2:
-		csh.push(csh.shift());
+		csh.unshift(csh.pop());
 		reconcileRotationH();
 		break;
 		case 3:
-		csh.unshift(csh.pop());
+		csh.push(csh.shift());
 		reconcileRotationH();
 		break;
 	}
 	console.log(csv);
 	console.log(csh);
+	console.log(object.c);
 };
 
 /*******************************
@@ -106,9 +107,13 @@ var animate = function() {
 		g.clearRect(0, 0, size, size);
 
 		g.fillStyle = colors[i];
+		g.font = "bold 16px Arial";
 		//g.fillRect(size/2 - 40, size/2 - 40, 80, 80);
 
 		var ti = (i < 4) ? csv[i] : (i === 4) ? csh[1] : csh[3];
+
+		g.fillText('index: ' + i, 100, 100);
+		g.fillText('t index: ' + ti, 100, 200);
 
 		transform(g.canvas, transformVals[ti]);
 
