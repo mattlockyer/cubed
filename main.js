@@ -33,13 +33,17 @@ var moves = {
 	40:new Vector(0, speed)
 };
 
+var fade = 0.12;
+
+var rotating = false;
+
 var transformVals = [
-[0, 0, 0, 0, 0, 0],
-[0, -160, -160, 90, 0, 0],
-[0, 0, -320, 0, 180, 0],
-[0, 160, -160, -90, 0, 0],
-[-160, 0, -160, 0, -90, 0],
-[160, 0, -160, 0, 90, 0]
+[0, 0, 0, 0, 0, 0, 1],
+[0, -160, -160, 90, 0, 0, fade],
+[0, 0, -320, 0, 180, 0, 0],
+[0, 160, -160, -90, 0, 0, fade],
+[-160, 0, -160, 0, -90, 0, fade],
+[160, 0, -160, 0, 90, 0, fade]
 ];
 
 var csv = [0, 1, 2, 3];
@@ -76,25 +80,25 @@ var reconcileRotationH = function() {
 var rotate = function(dir) {
 	switch (dir) {
 		case 0:
-		csv.unshift(csv.pop());
-		reconcileRotationV();
-		break;
-		case 1:
 		csv.push(csv.shift());
 		reconcileRotationV();
 		break;
-		case 2:
-		csh.unshift(csh.pop());
-		reconcileRotationH();
+		case 1:
+		csv.unshift(csv.pop());
+		reconcileRotationV();
 		break;
-		case 3:
+		case 2:
 		csh.push(csh.shift());
 		reconcileRotationH();
 		break;
+		case 3:
+		csh.unshift(csh.pop());
+		reconcileRotationH();
+		break;
 	}
-	console.log(csv);
-	console.log(csh);
-	console.log(object.c);
+	//console.log(csv);
+	//console.log(csh);
+	//console.log(object.c);
 };
 
 /*******************************
@@ -103,24 +107,26 @@ var rotate = function(dir) {
 
 var animate = function() {
 	for (var i = 0; i < 6; i++) {
-		var g = contexts[i];
+		var ti = (i < 4) ? csv[i] : (i === 4) ? csh[1] : csh[3];
+		
+		var g = contexts[ti];
 		g.clearRect(0, 0, size, size);
 
-		g.fillStyle = colors[i];
-		g.font = "bold 16px Arial";
+		/*******************************
+		* Debugging
+		*******************************/
+		//g.fillStyle = colors[ti];
+		//g.font = "bold 16px Arial";
 		//g.fillRect(size/2 - 40, size/2 - 40, 80, 80);
+		//g.fillText('index: ' + i, 100, 100);
+		//g.fillText('t index: ' + ti, 100, 200);
 
-		var ti = (i < 4) ? csv[i] : (i === 4) ? csh[1] : csh[3];
+		transform(g.canvas, transformVals[i]);
 
-		g.fillText('index: ' + i, 100, 100);
-		g.fillText('t index: ' + ti, 100, 200);
+		object.u(g, ti);
+		object.um(g, ti);
 
-		transform(g.canvas, transformVals[ti]);
-
-		object.u(g, i);
-		object.um(g, i);
-
-		if (object.c !== i) continue;
+		if (object.c !== ti) continue;
 
 		for (var k = 37; k < 41; k++)
 			if (keys[k]) object.a.a(moves[k]);
@@ -135,7 +141,8 @@ var animate = function() {
 
 var transform = function(el, args) {
 	var s = el.style;
-	s.transform = 'perspective(320px) translate3d(' + args[0] + 'px, ' + args[1] + 'px, '
+	s.opacity = args[6];
+	s.transform = 'perspective(40px) translate3d(' + args[0] + 'px, ' + args[1] + 'px, '
 		+ args[2] + 'px) rotateX(' + args[3] + 'deg) rotateY(' + args[4] + 'deg) rotateZ(' + args[5] + 'deg)';
 };
 
