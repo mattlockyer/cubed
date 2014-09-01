@@ -8,7 +8,7 @@ graphics.js \
 vector.js \
 obj.js \
 main.js \
-
+\
 -o app.min.js -m sort,toplevel,eval -c \
 sequences,dead_code,unsafe,conditionals,comparisons,evaluate,booleans,loops,unused,join_vars,\
 hoist_funs,if_return,cascade,drop_console --overwrite\

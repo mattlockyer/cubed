@@ -16,7 +16,7 @@ var Obj = function(img, p, v, a, d, c) {
 
 Obj.prototype = {
 	constructor:Obj,
-	u:function(g, c) {
+	u:function(g, c, i) {
 		var t = this,
 		p = t.p,
 		v = t.v,
@@ -46,6 +46,8 @@ Obj.prototype = {
 			t.c = move(t.c, false, -1);
 			if (t.z) rotate(3);
 		}
+		//if you're on the back canvas, return
+		if (i === 2) return;
 		//rotation
 		t.r = Math.atan2(v.y, v.x) + HALF_PI;
 		//if this is not your canvas, don't draw
@@ -57,10 +59,10 @@ Obj.prototype = {
 		g.drawImage(t.i, -halfObjSize, -halfObjSize);
 		g.restore();
 	},
-	um:function(g, c) {
+	um:function(g, c, i) {
 		var t = this;
 		for (var i = 0; i < t.m.length; i++)
-			t.m[i].u(g, c);
+			t.m[i].u(g, c, i);
 	},
 	f:function() {
 		var t = this;

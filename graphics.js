@@ -1,4 +1,6 @@
 
+
+var graphics = {};
 var cis = ['b', 'a', 'g', 'y', 'o', 'r'];
 var colors = ['DodgerBlue', 'Aqua', 'Lime', 'Gold', 'Orange', 'Red']
 
@@ -11,7 +13,7 @@ var genGraphics = function(g) {
 	var c = g.canvas;
 	for (var i = 0; i < colors.length; i++) {
 		var ci = graphics[cis[i]] = {};
-		//shape
+		//circle
 		var r = resetGraphic(g, objSize);
 		//draw
 		g.fillStyle = colors[i];
@@ -22,13 +24,13 @@ var genGraphics = function(g) {
 		ci.circle = r;
 		//next shape
 		var r = resetGraphic(g, objSize);
-		//draw
+		//rect
 		g.fillRect(0, 0, objSize, objSize);
 		r.src = c.toDataURL('image/png');
 		ci.rect = r;
 		//next shape
 		var r = resetGraphic(g, objSize);
-		//draw
+		//hex
 		g.beginPath();
 		var hex = [halfObjSize, 0, objSize, quarterObjSize, objSize, quarter3ObjSize, halfObjSize, objSize, 0, quarter3ObjSize, 0, quarterObjSize];
 		g.moveTo(hex[0], hex[1]);
@@ -39,7 +41,7 @@ var genGraphics = function(g) {
 		ci.hex = r;
 		//next shape
 		var r = resetGraphic(g, objSize);
-		//draw
+		//tri
 		g.beginPath();
 		var tri = [halfObjSize, 0, objSize, objSize, 0, objSize];
 		g.moveTo(tri[0], tri[1]);

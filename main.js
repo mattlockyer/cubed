@@ -1,5 +1,9 @@
 
 
+/*******************************
+* Setup and Constants
+*******************************/
+
 var PI = Math.PI,
 QUATER_PI = PI / 4,
 HALF_PI = PI / 2,
@@ -20,22 +24,11 @@ bounds = {
 var container = document.getElementById('c');
 var contexts = [];
 
-var graphics = {};
-
-var objects;
-
-var speed = 0.8;
-
-var moves = {
-	37:new Vector(-speed, 0),
-	38:new Vector(0, -speed),
-	39:new Vector(speed, 0),
-	40:new Vector(0, speed)
-};
+/*******************************
+* Transformations for Canvases
+*******************************/
 
 var fade = 0.12;
-
-var rotating = false;
 
 var transformVals = [
 [0, 0, 0, 0, 0, 0, 1],
@@ -46,15 +39,17 @@ var transformVals = [
 [160, 0, -160, 0, 90, 0, fade]
 ];
 
-var csv = [0, 1, 2, 3];
-var csh = [0, 4, 2, 5];
+/*******************************
+* Movement and Rotation Setup
+*******************************/
+
+var csv = [0, 1, 2, 3],
+csh = [0, 4, 2, 5],
+csvP = [],
+cshP = [];
 
 /*******************************
-* Something is off when you rotate and then rotate the other direction... not sure what.
-
-inconsistency between move and transformations perhaps... otherwise, really close to solution.
-
-Try rotating 1, 2, or 3 times in one direction, other rotations are off, when you are back to canonical, everything is fine...
+* Movement
 *******************************/
 
 var move = function(cur, vert, amount) {
@@ -68,34 +63,49 @@ var move = function(cur, vert, amount) {
 	return arr[i];
 };
 
-var reconcileRotationV = function() {
-	csh[0] = csv[0];
-	csh[2] = csv[2];
+/*******************************
+* Rotation
+*******************************/
+
+var reconcileRotation = function(arr, other) {
+	other[0] = arr[0];
+	other[2] = arr[2];
 };
-var reconcileRotationH = function() {
-	csv[0] = csh[0];
-	csv[2] = csh[2];
+var pushShift = function(arr) {
+	arr.push(arr.shift());
+	reconcileRotation(arr, (arr === csv) ? csh : csv);
 };
+var unshiftPop = function(arr) {
+	arr.unshift(arr.pop());
+	reconcileRotation(arr, (arr === csv) ? csh : csv);
+};
+
+var rotationDir = 0,
+rotationTimer = 0,
+newTransformValues = [],
+nextTransformVals = [];
 
 var rotate = function(dir) {
 	switch (dir) {
 		case 0:
-		csv.push(csv.shift());
-		reconcileRotationV();
+		csvP = csv;
+		pushShift(csv);
 		break;
 		case 1:
-		csv.unshift(csv.pop());
-		reconcileRotationV();
+		csvP = csv;
+		unshiftPop(csv);
 		break;
 		case 2:
-		csh.push(csh.shift());
-		reconcileRotationH();
+		cshP = csh;
+		pushShift(csh);
 		break;
 		case 3:
-		csh.unshift(csh.pop());
-		reconcileRotationH();
+		cshP = csh;
+		unshiftPop(csh);
 		break;
 	}
+	rotationDir = dir;
+	rotationTimer = 60;
 	//console.log(csv);
 	//console.log(csh);
 	//console.log(object.c);
@@ -105,11 +115,32 @@ var rotate = function(dir) {
 * Main Game Loop
 *******************************/
 
+var lerp = function(percent, a, b) {
+	return a + percent * (b - a);
+};
+
 var animate = function() {
+	requestAnimationFrame(animate);
+
 	for (var i = 0; i < 6; i++) {
 		var ti = (i < 4) ? csv[i] : (i === 4) ? csh[1] : csh[3];
 		
 		var g = contexts[ti];
+
+		if (rotationTimer > 0 && i === 0) {
+			var p = rotationTimer/60;
+			newTransformVals = transformVals[i].slice(0);
+			nextTransformVals = transformVals[i + 1].slice(0);
+			for (var j = 0; j < 7; j++) {
+				newTransformVals[j] = lerp(p, newTransformVals[j], nextTransformVals[j]);
+			}
+
+			transform(g.canvas, newTransformVals);
+
+			rotationTimer--;
+			continue;
+		}
+
 		g.clearRect(0, 0, size, size);
 
 		/*******************************
@@ -122,21 +153,21 @@ var animate = function() {
 		//g.fillText('t index: ' + ti, 100, 200);
 
 		transform(g.canvas, transformVals[i]);
+		if (i === 0) g.canvas.style.zIndex = 999;
+		else g.canvas.style.zIndex = 0;
 
-		object.u(g, ti);
-		object.um(g, ti);
+		player.um(g, ti, i);
+		player.u(g, ti, i);
 
-		if (object.c !== ti) continue;
+		if (player.c !== ti) continue;
 
 		for (var k = 37; k < 41; k++)
-			if (keys[k]) object.a.a(moves[k]);
+			if (keys[k]) player.a.a(moves[k]);
 
-		if (keys[32]) object.f();
-		if (keys[65]) object.m = [];
+		if (keys[32]) player.f();
+		if (keys[65]) player.m = [];
 
 	}
-
-	requestAnimationFrame(animate);
 };
 
 var transform = function(el, args) {
@@ -161,9 +192,9 @@ window.onload = function() {
 
 	genGraphics(contexts[0]);
 
-	object = new Obj(graphics.y.tri);
-	object.z = true;
-	object.p.s(halfSize, size);
+	player = new Obj(graphics.y.tri);
+	player.z = true;
+	player.p.s(halfSize, size);
 
 	animate();
 };
